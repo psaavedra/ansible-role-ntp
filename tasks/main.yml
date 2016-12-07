@@ -8,6 +8,10 @@
     dest: /etc/localtime
     state: link
     force: yes
+  tags:
+    - configuration
+    - ntp
+    - ntp-configuration
 
 # Debian family OSes also have an /etc/timezone file.
 - name: Set timezone in /etc/timezone file.
@@ -16,18 +20,34 @@
     dest: /etc/timezone
     force: yes
   when: ansible_os_family == 'Debian'
+  tags:
+    - configuration
+    - ntp
+    - ntp-configuration
 
 - name: Install NTP (RedHat).
   yum: name=ntp state=installed
   when: ansible_os_family == 'RedHat'
+  tags:
+    - configuration
+    - ntp
+    - ntp-install
 
 - name: Install NTP (Debian).
   apt: name=ntp state=installed
   when: ansible_os_family == 'Debian'
+  tags:
+    - configuration
+    - ntp
+    - ntp-install
 
 - name: Install NTP (FreeBSD).
   pkgng: name=ntp state=present
   when: ansible_os_family == 'FreeBSD'
+  tags:
+    - configuration
+    - ntp
+    - ntp-install
 
 - name: Ensure NTP is running and enabled as configured.
   service:
@@ -35,6 +55,10 @@
     state: started
     enabled: yes
   when: ntp_enabled
+  tags:
+    - configuration
+    - ntp
+    - ntp-install
 
 - name: Ensure NTP is stopped and disabled as configured.
   service:
@@ -42,8 +66,17 @@
     state: stopped
     enabled: no
   when: not ntp_enabled
+  tags:
+    - configuration
+    - ntp
+    - ntp-install
 
 - name: Generate ntp.conf file
   template: src=ntp.conf.j2 dest=/etc/ntp.conf
   notify: restart ntp
   when: ntp_manage_config
+  tags:
+    - configuration
+    - ntp
+    - ntp-configuration
+
